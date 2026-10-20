@@ -1,27 +1,93 @@
-# ========================================================
-# Contoh Berkas Kueri DQL (DapCode Query Language)
-# ========================================================
+# ==============================================================================
+# CONTOH KUERI DQL (DapCode Query Language) & DAPQL NATIVE DBMS
+# ==============================================================================
+# Berkas ini dapat:
+# 1. Dikompilasi ke SQL (Postgres/MySQL/SQLite):
+#    dql file examples/contoh.dql --dialect postgres
+# 2. Dieksekusi langsung pada basis data native DAPQL (.dapdb):
+#    dapql file examples/contoh.dql -d kedai_kopi.dapdb
+# ==============================================================================
 
-# 1. Kueri Baca Lengkap dengan Agregasi, Join, Filter, dan Limit
-ambil Pesanan sebagai p
-pilih p.id, p.total, u.nama sebagai nama_pelanggan, hitung(i.id) sebagai item_count
-gabung Pengguna sebagai u pada p.pengguna_id == u.id
-gabung ItemPesanan sebagai i pada p.id == i.pesanan_id
-di_mana p.status == "selesai" dan p.total >= 50000
-kelompokkan p.id, p.total, u.nama
-memiliki item_count > 1
-urutkan p.total turun
-batasi 10
-lewati 0
+# ------------------------------------------------------------------------------
+# 1. PENGELOLAAN SKEMA TABEL (DDL)
+# ------------------------------------------------------------------------------
 
-# 2. Pengelolaan Skema Tabel (DDL)
-# buat tabel jika_belum_ada Pengguna {
-#     id: seri kunci_utama,
-#     nama: teks tidak_kosong,
-#     email: teks unik,
-#     umur: bulat bawaan 18,
-#     dibuat_pada: waktu bawaan sekarang
-# }
-# tampilkan tabel
-# struktur Pengguna
+# Membuat tabel produk kopi
+buat tabel jika_belum_ada produk (
+    id seri pk,
+    nama teks bukan_null,
+    kategori teks bawaan 'Minuman',
+    harga bulat bukan_null,
+    stok bulat bawaan 100
+);
+
+# Melihat daftar semua tabel di database
+tampilkan tabel;
+
+# Melihat struktur kolom tabel produk
+struktur produk;
+
+# ------------------------------------------------------------------------------
+# 2. MENAMBAHKAN DATA (INSERT / DML)
+# ------------------------------------------------------------------------------
+
+tambah ke produk {nama: 'Espresso Single', kategori: 'Kopi', harga: 15000, stok: 50};
+tambah ke produk {nama: 'Kopi Susu Gula Aren', kategori: 'Kopi', harga: 22000, stok: 80};
+tambah ke produk {nama: 'Matcha Latte', kategori: 'Non-Kopi', harga: 25000, stok: 35};
+tambah ke produk {nama: 'Croissant Cokelat', kategori: 'Makanan', harga: 18000, stok: 20};
+tambah ke produk {nama: 'Air Mineral Dingin', kategori: 'Minuman', harga: 6000, stok: 120};
+
+# ------------------------------------------------------------------------------
+# 3. MEMBACA & MEMFILTER DATA (SELECT / DQL)
+# ------------------------------------------------------------------------------
+
+# Membaca seluruh data produk
+ambil * dari produk;
+
+# Membaca kolom tertentu dengan filter harga dan pengurutan (Sorting)
+ambil pilih nama, kategori, harga dari produk 
+di_mana harga >= 18000 dan kategori == 'Kopi'
+urutkan harga turun;
+
+# Pencarian teks menggunakan operator 'seperti' (LIKE) atau 'berisi'
+ambil pilih id, nama, harga dari produk 
+di_mana nama seperti '%Latte%' atau nama seperti '%Susu%';
+
+# ------------------------------------------------------------------------------
+# 4. FUNGSI AGREGASI & FUNGSI SKALAR
+# ------------------------------------------------------------------------------
+
+# Menghitung ringkasan statistik produk (Count, Sum, Avg, Min, Max)
+ambil pilih 
+    jumlah(id) sebagai total_menu,
+    total(harga) sebagai akumulasi_harga,
+    rata_rata(harga) sebagai harga_rerata,
+    min(harga) sebagai termurah,
+    max(harga) sebagai termahal
+dari produk;
+
+# Menggunakan fungsi manipulasi string skalar
+ambil pilih 
+    huruf_besar(nama) sebagai nama_kapital, 
+    panjang(nama) sebagai jumlah_karakter,
+    harga
+dari produk
+batasi 3;
+
+# ------------------------------------------------------------------------------
+# 5. MEMPERBARUI & MENGHAPUS DATA (UPDATE & DELETE)
+# ------------------------------------------------------------------------------
+
+# Memperbarui harga dan stok produk
+perbarui produk 
+atur harga = 20000, stok = 95 
+di_mana nama == 'Espresso Single';
+
+# Menghapus produk yang harganya di bawah 10000
+hapus dari produk 
+di_mana harga < 10000;
+
+# Memverifikasi data akhir setelah pembaruan dan penghapusan
+ambil * dari produk urutkan id naik;
+
 
