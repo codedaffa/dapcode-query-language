@@ -88,6 +88,7 @@ pub enum TokenKind {
     RBrace,       // }
     LBracket,     // [
     RBracket,     // ]
+    Semicolon,    // ;
 
     Eof,
 }

@@ -29,24 +29,30 @@ impl Parser {
     }
 
     pub fn parse_statement(&mut self) -> Result<DqlStatement, ParserError> {
-        self.skip_pipes();
+        self.skip_pipes_and_semicolons();
         let tok = self.peek();
 
-        match tok.kind {
-            TokenKind::Ambil | TokenKind::Dari => self.parse_ambil(),
-            TokenKind::TambahKe => self.parse_tambah(),
-            TokenKind::Perbarui => self.parse_perbarui(),
-            TokenKind::HapusDari => self.parse_hapus(),
-            TokenKind::Buat => self.parse_buat(),
-            TokenKind::Hapus => self.parse_hapus_statement(),
-            TokenKind::Tampilkan => self.parse_tampilkan(),
-            TokenKind::Struktur => self.parse_struktur(),
-            _ => Err(self.error(format!("Kueri DQL tidak dikenal atau tidak didukung: diawali dengan '{}'", tok.lexeme))),
-        }
+        let stmt = match tok.kind {
+            TokenKind::Ambil | TokenKind::Dari => self.parse_ambil()?,
+            TokenKind::TambahKe => self.parse_tambah()?,
+            TokenKind::Perbarui => self.parse_perbarui()?,
+            TokenKind::HapusDari => self.parse_hapus()?,
+            TokenKind::Buat => self.parse_buat()?,
+            TokenKind::Hapus => self.parse_hapus_statement()?,
+            TokenKind::Tampilkan => self.parse_tampilkan()?,
+            TokenKind::Struktur => self.parse_struktur()?,
+            _ => return Err(self.error(format!("Kueri DQL tidak dikenal atau tidak didukung: diawali dengan '{}'", tok.lexeme))),
+        };
+        self.skip_pipes_and_semicolons();
+        Ok(stmt)
     }
 
     fn skip_pipes(&mut self) {
         while self.match_token(&[TokenKind::Pipe]) {}
+    }
+
+    fn skip_pipes_and_semicolons(&mut self) {
+        while self.match_token(&[TokenKind::Pipe, TokenKind::Semicolon]) {}
     }
 
     // ==========================================
@@ -54,6 +60,15 @@ impl Parser {
     // ==========================================
     fn parse_ambil(&mut self) -> Result<DqlStatement, ParserError> {
         self.advance(); // consume 'ambil' or 'dari'
+
+        let mut initial_fields = Vec::new();
+        if self.match_token(&[TokenKind::Star]) {
+            initial_fields.push(SelectItem::All);
+            self.consume_keyword(&[TokenKind::Dari], "Diharapkan 'dari' setelah 'ambil *'")?;
+        } else if self.match_token(&[TokenKind::Pilih]) {
+            initial_fields = self.parse_select_fields()?;
+            self.consume_keyword(&[TokenKind::Dari], "Diharapkan 'dari' setelah daftar kolom 'pilih'")?;
+        }
 
         let table_name = self.consume_ident("Diharapkan nama tabel setelah 'ambil'/'dari'")?;
         let table_alias = if self.match_token(&[TokenKind::Sebagai]) {
@@ -67,7 +82,7 @@ impl Parser {
             alias: table_alias,
         };
 
-        let mut fields = Vec::new();
+        let mut fields = initial_fields;
         let mut joins = Vec::new();
         let mut filter = None;
         let mut group_by = Vec::new();
@@ -216,7 +231,12 @@ impl Parser {
     // PARSER: TAMBAH_KE (INSERT)
     // ==========================================
     fn parse_tambah(&mut self) -> Result<DqlStatement, ParserError> {
-        self.advance(); // consume 'tambah_ke'
+        self.advance(); // consume 'tambah' / 'tambah_ke'
+        if let TokenKind::Identifier(ref s) = self.peek().kind {
+            if s.to_lowercase() == "ke" {
+                self.advance();
+            }
+        }
         let table_name = self.consume_ident("Diharapkan nama tabel setelah 'tambah_ke'")?;
         let table = TableRef {
             name: table_name,
@@ -362,6 +382,14 @@ impl Parser {
                             constraints.is_primary_key = true;
                         } else if self.match_token(&[TokenKind::TidakKosong]) {
                             constraints.is_not_null = true;
+                        } else if self.check(&TokenKind::Tidak) {
+                            if self.cursor + 1 < self.tokens.len() && self.tokens[self.cursor + 1].kind == TokenKind::Nihil {
+                                self.advance();
+                                self.advance();
+                                constraints.is_not_null = true;
+                            } else {
+                                break;
+                            }
                         } else if self.match_token(&[TokenKind::Unik]) {
                             constraints.is_unique = true;
                         } else if self.match_token(&[TokenKind::Otomatis]) {
