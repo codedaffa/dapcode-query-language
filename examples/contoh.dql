@@ -1,0 +1,27 @@
+# ========================================================
+# Contoh Berkas Kueri DQL (DapCode Query Language)
+# ========================================================
+
+# 1. Kueri Baca Lengkap dengan Agregasi, Join, Filter, dan Limit
+ambil Pesanan sebagai p
+pilih p.id, p.total, u.nama sebagai nama_pelanggan, hitung(i.id) sebagai item_count
+gabung Pengguna sebagai u pada p.pengguna_id == u.id
+gabung ItemPesanan sebagai i pada p.id == i.pesanan_id
+di_mana p.status == "selesai" dan p.total >= 50000
+kelompokkan p.id, p.total, u.nama
+memiliki item_count > 1
+urutkan p.total turun
+batasi 10
+lewati 0
+
+# 2. Pengelolaan Skema Tabel (DDL)
+# buat tabel jika_belum_ada Pengguna {
+#     id: seri kunci_utama,
+#     nama: teks tidak_kosong,
+#     email: teks unik,
+#     umur: bulat bawaan 18,
+#     dibuat_pada: waktu bawaan sekarang
+# }
+# tampilkan tabel
+# struktur Pengguna
+

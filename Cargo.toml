@@ -1,0 +1,16 @@
+﻿[package]
+name = "dql"
+version = "0.1.0"
+edition = "2024"
+authors = ["DapCode Team"]
+description = "DapCode Query Language (DQL) - Standalone, Ergonomic & Multi-Language Database Query Language"
+
+[lib]
+name = "dql"
+crate-type = ["lib", "cdylib"]
+
+[[bin]]
+name = "dql"
+path = "src/main.rs"
+
+[dependencies]

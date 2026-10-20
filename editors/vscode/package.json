@@ -1,0 +1,54 @@
+{
+    "name": "dql-lang",
+    "displayName": "DQL (DapCode Query Language)",
+    "description": "Syntax Highlighting, Snippets, and Editor Support for DapCode Query Language (.dql)",
+    "version": "0.1.0",
+    "publisher": "dapcode-core",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/codedaffa/dapcode-lang"
+    },
+    "engines": {
+        "vscode": "^1.75.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Snippets"
+    ],
+    "keywords": [
+        "dql",
+        "dapcode",
+        "database",
+        "query-language",
+        "sql"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "dql",
+                "aliases": [
+                    "DapCode Query Language",
+                    "DQL",
+                    "dql"
+                ],
+                "extensions": [
+                    ".dql"
+                ],
+                "configuration": "./dql-language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "dql",
+                "scopeName": "source.dql",
+                "path": "./syntaxes/dql.tmLanguage.json"
+            }
+        ],
+        "snippets": [
+            {
+                "language": "dql",
+                "path": "./snippets/dql.json"
+            }
+        ]
+    }
+}
