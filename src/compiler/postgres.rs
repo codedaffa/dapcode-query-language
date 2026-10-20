@@ -29,6 +29,7 @@ impl PostgresCompiler {
             DqlStatement::BuatDatabase(q) => self.compile_buat_database(q)?,
             DqlStatement::HapusDatabase(q) => self.compile_hapus_database(q)?,
             DqlStatement::TampilkanTabel => "SELECT table_name AS tabel FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name;".to_string(),
+            DqlStatement::TampilkanDatabase => "SELECT datname AS database FROM pg_database WHERE datistemplate = false ORDER BY datname;".to_string(),
             DqlStatement::DeskripsiTabel(t) => format!("SELECT column_name, data_type, is_nullable, column_default FROM information_schema.columns WHERE table_name = '{}' ORDER BY ordinal_position;", t),
         };
 

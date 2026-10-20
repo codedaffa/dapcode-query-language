@@ -89,4 +89,14 @@ fn test_show_tables_and_structure() {
     let q2 = "struktur Pengguna";
     let res2 = compile(q2, Dialect::Sqlite, false).unwrap();
     assert_eq!(res2.sql, "PRAGMA table_info(\"Pengguna\");");
+
+    let q3 = "tampilkan basis_data";
+    let res3_mysql = compile(q3, Dialect::Mysql, false).unwrap();
+    assert_eq!(res3_mysql.sql, "SHOW DATABASES;");
+
+    let res3_sqlite = compile(q3, Dialect::Sqlite, false).unwrap();
+    assert_eq!(res3_sqlite.sql, "PRAGMA database_list;");
+
+    let res3_pg = compile(q3, Dialect::Postgres, false).unwrap();
+    assert_eq!(res3_pg.sql, "SELECT datname AS database FROM pg_database WHERE datistemplate = false ORDER BY datname;");
 }

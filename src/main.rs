@@ -4,10 +4,10 @@ use std::io::{self, Write};
 use dql::{compile, Dialect, LiveExecutor, LiveTarget};
 
 fn print_banner() {
-    println!("╔══════════════════════════════════════════════════════════╗");
-    println!("║       DQL - DapCode Query Language Toolchain v0.2.0      ║");
-    println!("║   Bahasa Kueri Mandiri Non-SQL & Live Database Engine    ║");
-    println!("╚══════════════════════════════════════════════════════════╝");
+    println!("+----------------------------------------------------------+");
+    println!("|       DQL - DapCode Query Language Toolchain v0.2.0      |");
+    println!("|   Bahasa Kueri Mandiri Non-SQL & Live Database Engine    |");
+    println!("+----------------------------------------------------------+");
 }
 
 fn print_help() {

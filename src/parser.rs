@@ -506,11 +506,13 @@ impl Parser {
     }
 
     fn parse_tampilkan(&mut self) -> Result<DqlStatement, ParserError> {
-        self.advance(); // consume 'tampilkan'
+        self.advance(); // consume 'tampilkan' / 'lihat' / 'show'
         if self.match_token(&[TokenKind::Tabel]) {
             Ok(DqlStatement::TampilkanTabel)
+        } else if self.match_token(&[TokenKind::BasisData]) {
+            Ok(DqlStatement::TampilkanDatabase)
         } else {
-            Err(self.error("Diharapkan 'tabel' setelah 'tampilkan' (contoh: 'tampilkan tabel')"))
+            Err(self.error("Diharapkan 'tabel' atau 'basis_data' setelah 'tampilkan' (contoh: 'tampilkan tabel', 'tampilkan basis_data')"))
         }
     }
 

@@ -29,6 +29,7 @@ impl SqliteCompiler {
             DqlStatement::BuatDatabase(q) => self.compile_buat_database(q)?,
             DqlStatement::HapusDatabase(q) => self.compile_hapus_database(q)?,
             DqlStatement::TampilkanTabel => "SELECT name AS tabel FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name;".to_string(),
+            DqlStatement::TampilkanDatabase => "PRAGMA database_list;".to_string(),
             DqlStatement::DeskripsiTabel(t) => format!("PRAGMA table_info({});", self.quote_ident(t)),
         };
 

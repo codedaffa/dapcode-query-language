@@ -27,6 +27,7 @@ impl MysqlCompiler {
             DqlStatement::BuatDatabase(q) => self.compile_buat_database(q)?,
             DqlStatement::HapusDatabase(q) => self.compile_hapus_database(q)?,
             DqlStatement::TampilkanTabel => "SHOW TABLES;".to_string(),
+            DqlStatement::TampilkanDatabase => "SHOW DATABASES;".to_string(),
             DqlStatement::DeskripsiTabel(t) => format!("DESCRIBE {};", self.quote_ident(t)),
         };
 

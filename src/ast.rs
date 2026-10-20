@@ -11,6 +11,7 @@ pub enum DqlStatement {
     BuatDatabase(BuatDatabaseQuery),
     HapusDatabase(HapusDatabaseQuery),
     TampilkanTabel,
+    TampilkanDatabase,
     DeskripsiTabel(String),
 }
 
